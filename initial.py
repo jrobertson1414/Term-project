@@ -38,5 +38,40 @@ lyrics = lyrics_finder.text.strip()
 
 
 
+# Here is how we could use html parser
 
+# import requests
+# from bs4 import BeautifulSoup
+# import nltk
+# from nltk.sentiment.vader import SentimentIntensityAnalyzer
+# from pydub import AudioSegment
+
+# # Step 1: Scrape lyrics from genius.com
+# song_url = "https://genius.com/artist/song-title"
+# response = requests.get(song_url)
+# soup = BeautifulSoup(response.text, "html.parser")
+# lyrics_element = soup.find("div", class_="lyrics")
+# lyrics = lyrics_element.text.strip()
+
+# # Step 2: Preprocess lyrics
+# lyrics = ''.join(c for c in lyrics if c.isalpha() or c.isspace())
+# lyrics = lyrics.lower()
+# words = nltk.word_tokenize(lyrics)
+
+# # Step 3: Perform sentiment analysis
+# sia = SentimentIntensityAnalyzer()
+# sentiment_scores = sia.polarity_scores(lyrics)
+
+# # Step 4: Classify song as happy or sad
+# if sentiment_scores["compound"] > 0.5:
+#     playlist = "happy"
+# else:
+#     playlist = "sad"
+
+# # Step 5: Add song to appropriate playlist
+# song = AudioSegment.from_file("song.mp3", format="mp3")
+# if playlist == "happy":
+#     happy_playlist.append(song)
+# else:
+#     sad_playlist.append(song)
 
