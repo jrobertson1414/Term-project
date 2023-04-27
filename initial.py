@@ -5,6 +5,7 @@ import urllib.request
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 import lyricsgenius
 import pandas as pd
+import re
 
 genius = lyricsgenius.Genius(
     "X5pP_hoFlaaLtLhQPeTOK6vq7nETrfo1JzQ9B4DLZVIMpY0Lw8Nup28dQwiDTEmY"
@@ -14,9 +15,11 @@ genius = lyricsgenius.Genius(
 def song_search_function():
     songs = {}
     songs_added = 0
-
-    while songs_added < 3:
-        song_input = input("Please type the name of the song you would like to add: ")
+    i=0
+    while i != 1:
+        i = 0
+        song_input = input(
+            "Please type the name of the song you would like to add: ")
 
         song_search = genius.search_song(song_input)
 
@@ -25,11 +28,33 @@ def song_search_function():
             songs_added += 1
         else:
             print(f"{song_input} couldn't be found on Genius. Please try again.")
+       
+        i = input("\nWould you like to add another song?")
+        i = i.lower()
+        if i == "yes":
+            i = 0
+        else:
+            i = 1
+            return songs
+
+def clean_lyrics(songs):
+    for title,lyrics in songs.items():
+        lines = lyrics.split('\n')
+        lines = lines[1:]
+        lyrics_lines = [line.strip() for line in lines if line.strip()]
+        lyrics = ' '.join(lyrics_lines)
+        songs[title] = lyrics
     return songs
 
 
-songs_dict = song_search_function()
-print(songs_dict)
+def main():
+    songs_dict = song_search_function()
+    songs_dict = clean_lyrics(songs_dict)
+    print(songs_dict)
+
+
+if __name__ == '__main__':
+    main()
 
 
 # for artist in artists:
