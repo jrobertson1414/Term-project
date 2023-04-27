@@ -1,32 +1,75 @@
 import requests
 from bs4 import BeautifulSoup
 import nltk
+import urllib.request
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
+import lyricsgenius
+import pandas as pd
 
-sentiment_analyzer = SentimentIntensityAnalyzer()
-
-Genius_api_key = 'X5pP_hoFlaaLtLhQPeTOK6vq7nETrfo1JzQ9B4DLZVIMpY0Lw8Nup28dQwiDTEmY'
-headers = {
-    'Authorization': 'Bearer X5pP_hoFlaaLtLhQPeTOK6vq7nETrfo1JzQ9B4DLZVIMpY0Lw8Nup28dQwiDTEmY'
-}
-response = requests.get('https://api.genius.com/songs/378195', headers=headers)
+genius = lyricsgenius.Genius(
+    "X5pP_hoFlaaLtLhQPeTOK6vq7nETrfo1JzQ9B4DLZVIMpY0Lw8Nup28dQwiDTEmY"
+)
 
 
-# Original Code
+def song_search_function():
+    songs = {}
+    songs_added = 0
 
-data = response.json()
-print(data)
-title = data['response']['song']['title']
-print(title)
+    while songs_added < 3:
+        song_input = input("Please type the name of the song you would like to add: ")
+
+        song_search = genius.search_song(song_input)
+
+        if song_search:
+            songs[song_search.title] = song_search.lyrics
+            songs_added += 1
+        else:
+            print(f"{song_input} couldn't be found on Genius. Please try again.")
+    return songs
 
 
+songs_dict = song_search_function()
+print(songs_dict)
 
 
-# Using HTML should look like this 
+# for artist in artists:
+#     # Get the artist object
+#     artist_obj = genius.search_artist(artist, max_songs=1)
 
-soup = BeautifulSoup(response.text, "html.parser")
-lyrics_finder = soup.find("div", class_="lyrics")
-lyrics = lyrics_finder.text.strip()
+#     # Print the artist name
+#     print(artist_obj.name)
+
+#     # Loop through the artist's songs and print the lyrics
+#     for song in artist_obj.songs:
+#         print(song.lyrics)
+
+
+# artist = genius.search_artist("Sigala", max_songs=3, sort="title")
+# print(artist.songs)
+
+
+# sentiment_analyzer = SentimentIntensityAnalyzer()
+
+# Genius_api_key = 'X5pP_hoFlaaLtLhQPeTOK6vq7nETrfo1JzQ9B4DLZVIMpY0Lw8Nup28dQwiDTEmY'
+# headers = {
+#     'Authorization': 'Bearer X5pP_hoFlaaLtLhQPeTOK6vq7nETrfo1JzQ9B4DLZVIMpY0Lw8Nup28dQwiDTEmY'
+# }
+# response = requests.get('https://api.genius.com/songs/378195', headers=headers)
+
+# def download_page(url):
+#     return urllib.request.urlopen(url)
+
+
+# def parse_html(html):
+#     """
+#     Analyze the genius top 50 songs page, find the information and return the song and lyrics list of tuples
+#     (song_name, lyrics)
+#     """
+#     soup = BeautifulSoup(response.text, "html.parser")
+#     print(soup.prettify())
+
+# lyrics_finder = soup.find("div", class_="lyrics")
+# lyrics = lyrics_finder.text.strip()
 
 
 # The thing about sentiment analysis is that there is only positive, negative, and neutral. We could technically create our own genres by maybe saying that neutral lyrics are "chill"
@@ -34,44 +77,9 @@ lyrics = lyrics_finder.text.strip()
 # have a higher likelihood of being negative/ neutral
 
 
+# Original Code
 
-
-
-
-# Here is how we could use html parser
-
-# import requests
-# from bs4 import BeautifulSoup
-# import nltk
-# from nltk.sentiment.vader import SentimentIntensityAnalyzer
-# from pydub import AudioSegment
-
-# # Step 1: Scrape lyrics from genius.com
-# song_url = "https://genius.com/artist/song-title"
-# response = requests.get(song_url)
-# soup = BeautifulSoup(response.text, "html.parser")
-# lyrics_element = soup.find("div", class_="lyrics")
-# lyrics = lyrics_element.text.strip()
-
-# # Step 2: Preprocess lyrics
-# lyrics = ''.join(c for c in lyrics if c.isalpha() or c.isspace())
-# lyrics = lyrics.lower()
-# words = nltk.word_tokenize(lyrics)
-
-# # Step 3: Perform sentiment analysis
-# sia = SentimentIntensityAnalyzer()
-# sentiment_scores = sia.polarity_scores(lyrics)
-
-# # Step 4: Classify song as happy or sad
-# if sentiment_scores["compound"] > 0.5:
-#     playlist = "happy"
-# else:
-#     playlist = "sad"
-
-# # Step 5: Add song to appropriate playlist
-# song = AudioSegment.from_file("song.mp3", format="mp3")
-# if playlist == "happy":
-#     happy_playlist.append(song)
-# else:
-#     sad_playlist.append(song)
-
+# data = response.json()
+# print(data)
+# title = data['response']['song']['title']
+# print(title)
