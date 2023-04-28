@@ -1,57 +1,44 @@
-import csv
-import urllib.request
-from bs4 import BeautifulSoup
+import lyricsgenius
+import nltk
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
+import re
 
+genius = lyricsgenius.Genius("X5pP_hoFlaaLtLhQPeTOK6vq7nETrfo1JzQ9B4DLZVIMpY0Lw8Nup28dQwiDTEmY")
+nltk.download('vader_lexicon')
 
-DOWNLOAD_URL = 'https://www.imdb.com/chart/top'
-
-
-def download_page(url):
-    return urllib.request.urlopen(url)
-
-
-# print(download_page(DOWNLOAD_URL).read())
-
-
-def parse_html(html):
+def clean_lyrics(lyrics):
     """
-    Analyze the html page, find the information and return the move list of tuples (movie_name, year)
+    Cleans up the song lyrics by removing any blank lines and leading/trailing whitespace.
     """
-    soup = BeautifulSoup(html, features="html.parser")
-    # print(soup.prettify())
-    movie_table = soup.find('tbody', attrs={'class': 'lister-list'})
-    # print(movie_table)
-    movie_list = []
-    for movie_row in movie_table.find_all('tr'):
-        movie_detail = movie_row.find('td', attrs={'class': 'titleColumn'})
-        # print(movie_detail)
-        movie_name = movie_detail.find('a').string
-        print(movie_name)
-        year = movie_detail.find('span', attrs={'class': 'secondaryInfo'}).string.strip('()')
-        # print(year)
-        rating_col = movie_row.find('td', attrs={'class': 'imdbRating'})
-        rating = rating_col.find('strong').string
-        print(rating)
-        movie_list.append((movie_name, year, rating))
-    return movie_list
+    lines = lyrics.split('\n')
+    lines = lines[1:]
+    lyrics_lines = [line.strip() for line in lines if line.strip()]
+    cleaned_lyrics = ' '.join(lyrics_lines)
+    return cleaned_lyrics
 
-
-# parse_html(download_page(DOWNLOAD_URL).read())
-
+def get_sentiment_score(text):
+    """
+    Analyzes the sentiment of the given text and returns a sentiment score.
+    """
+    sia = SentimentIntensityAnalyzer()
+    sentiment_score = sia.polarity_scores(text)
+    return sentiment_score
 
 def main():
-    url = DOWNLOAD_URL
-
-    with open('data/imdb_top250.csv', 'w', encoding='utf-8', newline='') as f:
-        writer = csv.writer(f)
-
-        fields = ('Name', 'Year', 'Rating')
-        writer.writerow(fields)
-
-        html = download_page(url)
-        movies = parse_html(html)
-        writer.writerows(movies)
-
+    song_input = input("Please type the name of the song you would like to analyze: ")
+    song_search = genius.search_song(song_input)
+    if song_search:
+        lyrics = song_search.lyrics
+        cleaned_lyrics = clean_lyrics(lyrics)
+        sentiment_score = get_sentiment_score(cleaned_lyrics)
+        if sentiment_score['compound'] >= 0:
+            print(f"{song_search.title} has a happy sentiment score.")
+            # Add song to happy playlist
+        else:
+            print(f"{song_search.title} has a sad sentiment score.")
+            # Add song to sad playlist
+    else:
+        print(f"Sorry, couldn't find the lyrics for {song_input} on Genius. Please try again.")
 
 if __name__ == '__main__':
     main()
