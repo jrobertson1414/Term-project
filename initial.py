@@ -22,8 +22,8 @@ def search_song_lyrics():
             print(
                 f"Found the following song: {song_search.title} by {song_search.artist}"
             )
-            confirm = input("Is this the correct song? (y/n): ")
-            if confirm.lower() == "y":
+            confirm = input("Is this the correct song? (yes or no): ")
+            if confirm.lower() == "yes":
                 songs[song_search.title] = song_search.lyrics
                 songs_added += 1
             else:
@@ -32,8 +32,8 @@ def search_song_lyrics():
             print(
                 f"Sorry, couldn't find the lyrics for {song_title} by {artist_name} on Genius. Please try again."
             )
-        add_another_song = input("\nWould you like to add another song? (y/n) ")
-        if add_another_song.lower() != "y":
+        add_another_song = input("\nWould you like to add another song? (yes or no) ")
+        if add_another_song.lower() != "yes":
             break
     return songs
 
@@ -56,8 +56,8 @@ def get_sentiment_score(lyrics):
     Uses the SentimentIntensityAnalyzer from the nltk library to calculate the sentiment score
     for the given lyrics.
     """
-    sia = SentimentIntensityAnalyzer()
-    sentiment_score = sia.polarity_scores(lyrics)
+    sentiment_analyzer = SentimentIntensityAnalyzer()
+    sentiment_score = sentiment_analyzer.polarity_scores(lyrics)
     return sentiment_score
 
 
@@ -73,7 +73,7 @@ def add_songs_to_playlist(songs_dict):
         sentiment_score = get_sentiment_score(lyrics)
         if sentiment_score["compound"] >= 0.5:
             happy_playlist.append((title, lyrics))
-        elif sentiment_score["compound"] <= -0.5:
+        elif sentiment_score["compound"] <= 0.5:
             sad_playlist.append((title, lyrics))
 
     print("Happy playlist:")
