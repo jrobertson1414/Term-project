@@ -1,5 +1,7 @@
 import lyricsgenius
+
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
+
 import re
 
 genius = lyricsgenius.Genius(
@@ -49,6 +51,7 @@ def clean_song_lyrics(songs):
         cleaned_lyrics = " ".join(lyrics_lines)
         songs[title] = cleaned_lyrics
     return songs
+
 
 
 def get_sentiment_score(lyrics):
